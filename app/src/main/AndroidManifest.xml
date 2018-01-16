@@ -23,11 +23,7 @@
         <activity
             android:name=".NirbhayaActivity"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <service
@@ -53,6 +49,19 @@
         <activity
             android:name=".NirbhayaMapsActivity"
             android:label="@string/title_activity_nirbhaya_maps"></activity>
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".home" />
+        <activity android:name=".Sign_in" />
+        <activity android:name=".Sign_up" />
+        <activity android:name=".profile" />
+        <activity android:name=".Emeregency_contacts" />
+        <activity android:name=".Add_location" />
     </application>
 
 </manifest>

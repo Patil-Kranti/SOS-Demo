@@ -6,10 +6,10 @@
     android:weightSum="1">
 
     <Button
+        android:id="@+id/buttonStopService"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Stop Nirbhaya Service"
-        android:id="@+id/buttonStopService"
         android:layout_alignParentBottom="true"
+        android:text="Stop Nirbhaya Service"
          />
 </RelativeLayout>
