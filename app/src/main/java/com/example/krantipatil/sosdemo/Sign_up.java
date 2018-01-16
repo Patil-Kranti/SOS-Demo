@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.krantipatil.sosdemo.MainActivity;
+import com.example.krantipatil.sosdemo.Main2Activity;
 import com.example.krantipatil.sosdemo.R;
 
 public class Sign_up extends AppCompatActivity {
@@ -23,7 +23,7 @@ private Button Signup;
     Signup.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent signupIntent=new Intent(Sign_up.this,MainActivity.class);
+            Intent signupIntent=new Intent(Sign_up.this,Main2Activity.class);
             startActivity(signupIntent);
         }
     });
