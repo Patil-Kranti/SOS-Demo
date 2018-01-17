@@ -1,11 +1,16 @@
 package com.example.krantipatil.sosdemo;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -77,18 +82,29 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             @Override
             public void onClick(View view) {
                 SmsManager smsManager = SmsManager.getDefault();
-                smsManager.sendTextMessage("5554", null, "sos", null, null);
+                String s = "5554";
+                smsManager.sendTextMessage(s, null, "sos", null, null);
                 Toast.makeText(Main2Activity.this, "meassage send", Toast.LENGTH_SHORT).show();
             }
         });
         call.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
                 Toast.makeText(Main2Activity.this, "call", Toast.LENGTH_SHORT).show();
+                Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:5554"));
+                if (checkpermission(Manifest.permission.CALL_PHONE)) {
+                    startActivity(callIntent);
+                }
             }
         });
+
+
     }
 
+    private boolean checkpermission(String permisson) {
+        return ContextCompat.checkSelfPermission(this, permisson) == PackageManager.PERMISSION_GRANTED;
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
