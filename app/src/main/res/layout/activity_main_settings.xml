@@ -13,8 +13,8 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="30dp"
         android:ems="10"
-        android:inputType="phone"
-        android:hint="Phone Number" />
+        android:hint="Phone Number"
+        android:inputType="phone" />
 
     <EditText
         android:id="@+id/editTextMessage"
@@ -22,11 +22,11 @@
         android:layout_height="80dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="20dp"
         android:layout_below="@+id/editTextPhoneNumber"
-        android:singleLine="false"
+        android:layout_marginTop="20dp"
+        android:hint="Type your message here"
         android:inputType="textPersonName"
-        android:hint="Type your message here" />
+        android:singleLine="false" />
 
     <Button
         android:id="@+id/buttonContacts"
@@ -41,8 +41,8 @@
         android:id="@+id/buttonSet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="82dp"
         android:text="Set Your Preferences" />
 
