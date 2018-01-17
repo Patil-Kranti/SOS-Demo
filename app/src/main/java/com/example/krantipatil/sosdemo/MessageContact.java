@@ -7,48 +7,63 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ListView;
 
-public class Emeregency_contacts extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class MessageContact extends AppCompatActivity {
     public static final int PICK_CONTACT = 1;
-    private static final String TAG = "Emeregency_contacts";
+    private static final String TAG = "MessageContact";
+    public String name, number;
     public Uri uriContact;
-    private Button btnCall, btnMessage;
-    private TextView tvCallContact, tvCallNumber;
+    ArrayAdapter<String> adapter;
+    private Button btnAdd;
+    private ListView listView;
     private String contactID;
-
+    private ArrayList<String> arrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_emeregency_contacts);
-        init();
-    }
+        setContentView(R.layout.activity_message_contact);
+        btnAdd = findViewById(R.id.btnAdd);
+        listView = findViewById(R.id.list);
+        arrayList = new ArrayList<String>();
+        adapter = new ArrayAdapter<String>(MessageContact.this, android.R.layout.simple_list_item_1, arrayList);
+        listView.setAdapter(adapter);
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                SparseBooleanArray positionChecker = listView.getCheckedItemPositions();
+                int count = listView.getCount();
+                for (int item = count - 1; item >= 0; item--) {
+                    if (positionChecker.get(item)) {
+                        adapter.remove(arrayList.get(item));
+                    }
+                }
+                positionChecker.clear();
+                adapter.notifyDataSetChanged();
 
-    private void init() {
-        tvCallContact = findViewById(R.id.tvCallContact);
-        tvCallNumber = findViewById(R.id.tvCallNumber);
-        btnCall = findViewById(R.id.add_emergency_call_button);
-        btnMessage = findViewById(R.id.add_emergency_message_button);
+                return false;
+            }
+        });
 
-        btnCall.setOnClickListener(new View.OnClickListener() {
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 pickAContactNumber(v);
 
             }
         });
-        btnMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent msgContactIntent = new Intent(Emeregency_contacts.this, MessageContact.class);
-                startActivity(msgContactIntent);
-            }
-        });
-    }
 
+
+    }
 
     public void pickAContactNumber(View view) {
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
@@ -63,11 +78,17 @@ public class Emeregency_contacts extends AppCompatActivity {
 
             retriveContactName();
             retrieveContactNumber();
+            listviewItem();
 
 
         }
     }
 
+    public void listviewItem() {
+        String contact = name + "    " + number;
+        arrayList.add(contact);
+        adapter.notifyDataSetChanged();
+    }
 
     public void retrieveContactNumber() {
 
@@ -104,7 +125,7 @@ public class Emeregency_contacts extends AppCompatActivity {
 
         cursorPhone.close();
 
-        tvCallNumber.setText("Contact Number:\n" + contactNumber);
+        number = contactNumber;
     }
 
     public void retriveContactName() {
@@ -124,8 +145,7 @@ public class Emeregency_contacts extends AppCompatActivity {
 
         cursor.close();
 
-        tvCallContact.setText("Name:\n" + contactName);
+        name = contactName;
 
     }
 }
-

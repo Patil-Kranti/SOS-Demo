@@ -71,18 +71,6 @@
             android:layout_height="62dp"
             android:layout_marginHorizontal="140dp"
             android:background="@drawable/ic_person_add_black_24dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </ListView>
-        </LinearLayout>
-
     </LinearLayout>
 
 
