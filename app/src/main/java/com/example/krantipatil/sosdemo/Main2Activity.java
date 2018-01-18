@@ -5,6 +5,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -17,19 +20,29 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
     public static boolean checker = true;
+    protected LocationManager locationManager;
+    protected LocationListener locationListener;
+    protected Context context;
+    protected String latitude, longitude;
+    protected boolean gps_enabled, network_enabled;
     MediaPlayer mediaPlayer;
     AudioManager am;
+    String lat;
+    String lati, longi;
+    String provider;
     private Button call, message, siren;
     private ImageView sos;
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +59,8 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         init();
     }
 
@@ -56,9 +70,22 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         message = findViewById(R.id.message_button);
         call = findViewById(R.id.call_button);
         sos.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
                 Toast.makeText(Main2Activity.this, "sos", Toast.LENGTH_SHORT).show();
+                Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:5554"));
+                if (checkpermission(Manifest.permission.CALL_PHONE)) {
+
+                    startActivity(callIntent);
+                }
+                SmsManager smsManager = SmsManager.getDefault();
+
+                String msg = "help help help\n http://maps.google.com/?q=";
+                String message = msg + lati + "," + longi;
+                smsManager.sendTextMessage("5554", null, message, null, null);
+
+
             }
         });
         siren.setOnClickListener(new View.OnClickListener() {
@@ -82,8 +109,10 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
             @Override
             public void onClick(View view) {
                 SmsManager smsManager = SmsManager.getDefault();
-                String s = "5554";
-                smsManager.sendTextMessage(s, null, "sos", null, null);
+                String msg = "help help help\n http://maps.google.com/?q=";
+                String message = msg + lati + "," + longi;
+                smsManager.sendTextMessage("5554", null, message, null, null);
+
                 Toast.makeText(Main2Activity.this, "meassage send", Toast.LENGTH_SHORT).show();
             }
         });
@@ -157,5 +186,29 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+        lati = String.valueOf(location.getLatitude());
+        longi = String.valueOf(location.getLongitude());
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+        Log.d("Latitude", "disable");
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+        Log.d("Latitude", "enable");
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+        Log.d("Latitude", "status");
     }
 }
