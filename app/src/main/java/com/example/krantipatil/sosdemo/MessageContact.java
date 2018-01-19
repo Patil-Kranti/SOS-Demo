@@ -13,15 +13,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MessageContact extends AppCompatActivity {
     public static final int PICK_CONTACT = 1;
     private static final String TAG = "MessageContact";
-    public String name, number;
     public Uri uriContact;
+    String phoneNo = null;
+    String name = null;
     ArrayAdapter<String> adapter;
+    DatabaseHelper databaseHelper;
     private Button btnAdd;
     private ListView listView;
     private String contactID;
@@ -34,8 +38,9 @@ public class MessageContact extends AppCompatActivity {
         btnAdd = findViewById(R.id.btnAdd);
         listView = findViewById(R.id.list);
         arrayList = new ArrayList<String>();
-        adapter = new ArrayAdapter<String>(MessageContact.this, android.R.layout.simple_list_item_1, arrayList);
         listView.setAdapter(adapter);
+        databaseHelper = new DatabaseHelper(this);
+
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -57,95 +62,74 @@ public class MessageContact extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pickAContactNumber(v);
-
+                pickContact(v);
             }
         });
 
 
     }
 
-    public void pickAContactNumber(View view) {
-        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        startActivityForResult(intent, PICK_CONTACT);
+    public void pickContact(View v) {
+        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        startActivityForResult(contactPickerIntent, PICK_CONTACT);
     }
-
     @Override
-    public void onActivityResult(int reqCode, int resultCode, Intent data) {
-        if (reqCode == PICK_CONTACT && resultCode == RESULT_OK) {
-            Log.d(TAG, "Response: " + data.toString());
-            uriContact = data.getData();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // check whether the result is ok
+        if (resultCode == RESULT_OK) {
+            // Check for the request code, we might be usign multiple startActivityForReslut
+            switch (requestCode) {
+                case PICK_CONTACT:
+                    contactPicked(data);
+                    addContact();
+                    showdata();
 
-            retriveContactName();
-            retrieveContactNumber();
-            listviewItem();
-
-
+                    break;
+            }
+        } else {
+            Log.e("MainActivity", "Failed to pick contact");
         }
     }
 
-    public void listviewItem() {
-        String contact = name + "    " + number;
-        arrayList.add(contact);
-        adapter.notifyDataSetChanged();
+    public void addContact() {
+        databaseHelper.addContact(new ContactModel(name, phoneNo));
+        Toast.makeText(this, "Data is updated", Toast.LENGTH_SHORT).show();
+
     }
 
-    public void retrieveContactNumber() {
+    public void showdata() {
+        List<ContactModel> contactModels = databaseHelper.getAllContacts();
+        for (int i = 0; i < contactModels.size(); i++)
 
-        String contactNumber = null;
-
-        // getting contacts ID
-        Cursor cursorID = getContentResolver().query(uriContact,
-                new String[]{ContactsContract.Contacts._ID},
-                null, null, null);
-
-        if (cursorID.moveToFirst()) {
-
-            contactID = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
-        }
-
-        cursorID.close();
-
-        Log.d(TAG, "Contact ID: " + contactID);
-
-        // Using the contact ID now we will get contact phone number
-        Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
-
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? AND " +
-                        ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
-                        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
-
-                new String[]{contactID},
-                null);
-
-        if (cursorPhone.moveToFirst()) {
-            contactNumber = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-        }
-
-        cursorPhone.close();
-
-        number = contactNumber;
+            Log.d(TAG, " Name:" + contactModels.get(i).getName() +
+                    " PhoneNumber:" + contactModels.get(i).getPhoneNumber());
     }
 
-    public void retriveContactName() {
+    /**
+     * Query the Uri and read contact details. Handle the picked contact data.
+     *
+     * @param data
+     */
+    private void contactPicked(Intent data) {
+        Cursor cursor = null;
+        try {
 
-        String contactName = null;
+            // getData() method will have the Content Uri of the selected contact
+            Uri uri = data.getData();
+            //Query the content uri
+            cursor = getContentResolver().query(uri, null, null, null, null);
+            cursor.moveToFirst();
+            // column index of the phone number
+            int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            // column index of the contact name
+            int nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+            phoneNo = cursor.getString(phoneIndex);
+            name = cursor.getString(nameIndex);
+            // Set the value to the textviews
 
-        // querying contact data store
-        Cursor cursor = getContentResolver().query(uriContact, null, null, null, null);
-
-        if (cursor.moveToFirst()) {
-
-            // DISPLAY_NAME = The display name for the contact.
-            // HAS_PHONE_NUMBER =   An indicator of whether this contact has at least one phone number.
-
-            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        cursor.close();
-
-        name = contactName;
-
     }
 }

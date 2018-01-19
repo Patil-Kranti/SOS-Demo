@@ -27,6 +27,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.util.List;
+
 public class Main2Activity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, LocationListener {
     public static boolean checker = true;
     protected LocationManager locationManager;
@@ -39,6 +41,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
     String lat;
     String lati, longi;
     String provider;
+    DatabaseHelper databaseHelper;
     private Button call, message, siren;
     private ImageView sos;
 
@@ -69,6 +72,7 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         siren = findViewById(R.id.siren_button);
         message = findViewById(R.id.message_button);
         call = findViewById(R.id.call_button);
+        databaseHelper = new DatabaseHelper(this);
         sos.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
             @Override
@@ -80,7 +84,6 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
                     startActivity(callIntent);
                 }
                 SmsManager smsManager = SmsManager.getDefault();
-
                 String msg = "help help help\n http://maps.google.com/?q=";
                 String message = msg + lati + "," + longi;
                 smsManager.sendTextMessage("5554", null, message, null, null);
@@ -108,10 +111,30 @@ public class Main2Activity extends AppCompatActivity implements NavigationView.O
         message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                List<ContactModel> contactModels = databaseHelper.getAllContacts();
+
+                StringBuilder builder = new StringBuilder();
+                String phoneNumber[] = new String[50];
+                for (int i = 0; i < contactModels.size(); i++) {
+
+                    phoneNumber[i] = contactModels.get(i).getPhoneNumber();
+//                    builder.append(phoneNumber);
+//                    builder.append(";");
+
+                }
+
+                System.out.println(builder);
                 SmsManager smsManager = SmsManager.getDefault();
                 String msg = "help help help\n http://maps.google.com/?q=";
                 String message = msg + lati + "," + longi;
-                smsManager.sendTextMessage("5554", null, message, null, null);
+                for (String s : phoneNumber) {
+                    if (s != null) {
+                        System.out.println(s);
+                        smsManager.sendTextMessage(s, null, message, null, null);
+                    } else
+                        break;
+                }
+
 
                 Toast.makeText(Main2Activity.this, "meassage send", Toast.LENGTH_SHORT).show();
             }
