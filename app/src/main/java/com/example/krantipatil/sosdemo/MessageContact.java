@@ -2,14 +2,13 @@ package com.example.krantipatil.sosdemo;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -26,6 +25,9 @@ public class MessageContact extends AppCompatActivity {
     String name = null;
     ArrayAdapter<String> adapter;
     DatabaseHelper databaseHelper;
+    SQLiteDatabase sqLiteDatabase;
+    Cursor cursor;
+    ListAdapter listAdapter;
     private Button btnAdd;
     private ListView listView;
     private String contactID;
@@ -35,28 +37,30 @@ public class MessageContact extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_contact);
+        init();
+    }
+
+    private void init() {
         btnAdd = findViewById(R.id.btnAdd);
         listView = findViewById(R.id.list);
         arrayList = new ArrayList<String>();
         listView.setAdapter(adapter);
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper = new DatabaseHelper(getApplicationContext());
+        sqLiteDatabase = databaseHelper.getReadableDatabase();
+        cursor = databaseHelper.getAllData();
+        listAdapter = new ListAdapter(getApplicationContext(), R.layout.single_row_item);
+        listView.setAdapter(listAdapter);
+        if (cursor.moveToFirst()) {
+            do {
+                String name, number;
+                name = cursor.getString(0);
+                number = cursor.getString(1);
+                ContactModel contactModel = new ContactModel(name, number);
+                listAdapter.add(contactModel);
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                SparseBooleanArray positionChecker = listView.getCheckedItemPositions();
-                int count = listView.getCount();
-                for (int item = count - 1; item >= 0; item--) {
-                    if (positionChecker.get(item)) {
-                        adapter.remove(arrayList.get(item));
-                    }
-                }
-                positionChecker.clear();
-                adapter.notifyDataSetChanged();
 
-                return false;
-            }
-        });
+            } while (cursor.moveToFirst());
+        }
 
 
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -65,7 +69,6 @@ public class MessageContact extends AppCompatActivity {
                 pickContact(v);
             }
         });
-
 
     }
 
@@ -104,6 +107,8 @@ public class MessageContact extends AppCompatActivity {
 
             Log.d(TAG, " Name:" + contactModels.get(i).getName() +
                     " PhoneNumber:" + contactModels.get(i).getPhoneNumber());
+
+
     }
 
     /**
