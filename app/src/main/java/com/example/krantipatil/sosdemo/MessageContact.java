@@ -40,14 +40,62 @@ public class MessageContact extends AppCompatActivity {
         init();
     }
 
-    private void init() {
+    public void init() {
         btnAdd = findViewById(R.id.btnAdd);
         listView = findViewById(R.id.list);
         arrayList = new ArrayList<String>();
-        listView.setAdapter(adapter);
         databaseHelper = new DatabaseHelper(getApplicationContext());
         sqLiteDatabase = databaseHelper.getReadableDatabase();
         cursor = databaseHelper.getAllData();
+
+        showdata();
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickContact(v);
+            }
+        });
+
+    }
+
+
+    public void pickContact(View v) {
+        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        startActivityForResult(contactPickerIntent, PICK_CONTACT);
+
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // check whether the result is ok
+        if (resultCode == RESULT_OK) {
+            // Check for the request code, we might be usign multiple startActivityForReslut
+            switch (requestCode) {
+                case PICK_CONTACT:
+                    contactPicked(data);
+                    addContact();
+
+                    break;
+            }
+        } else {
+            Log.e("MainActivity", "Failed to pick contact");
+        }
+    }
+
+    public void addContact() {
+        databaseHelper.addContact(new ContactModel(name, phoneNo));
+
+        Toast.makeText(this, "Data is updated", Toast.LENGTH_SHORT).show();
+    }
+
+    public void showdata() {
+        List<ContactModel> contactModels = databaseHelper.getAllContacts();
+        for (int i = 0; i < contactModels.size(); i++)
+
+            Log.d(TAG, " Name:" + contactModels.get(i).getName() +
+                    " PhoneNumber:" + contactModels.get(i).getPhoneNumber());
+
         listAdapter = new ListAdapter(getApplicationContext(), R.layout.single_row_item);
         listView.setAdapter(listAdapter);
         if (cursor.moveToFirst()) {
@@ -59,54 +107,9 @@ public class MessageContact extends AppCompatActivity {
                 listAdapter.add(contactModel);
 
 
-            } while (cursor.moveToFirst());
+            } while (cursor.moveToNext());
         }
-
-
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickContact(v);
-            }
-        });
-
-    }
-
-    public void pickContact(View v) {
-        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-        startActivityForResult(contactPickerIntent, PICK_CONTACT);
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // check whether the result is ok
-        if (resultCode == RESULT_OK) {
-            // Check for the request code, we might be usign multiple startActivityForReslut
-            switch (requestCode) {
-                case PICK_CONTACT:
-                    contactPicked(data);
-                    addContact();
-                    showdata();
-
-                    break;
-            }
-        } else {
-            Log.e("MainActivity", "Failed to pick contact");
-        }
-    }
-
-    public void addContact() {
-        databaseHelper.addContact(new ContactModel(name, phoneNo));
-        Toast.makeText(this, "Data is updated", Toast.LENGTH_SHORT).show();
-
-    }
-
-    public void showdata() {
-        List<ContactModel> contactModels = databaseHelper.getAllContacts();
-        for (int i = 0; i < contactModels.size(); i++)
-
-            Log.d(TAG, " Name:" + contactModels.get(i).getName() +
-                    " PhoneNumber:" + contactModels.get(i).getPhoneNumber());
+        Toast.makeText(this, "Data is showen", Toast.LENGTH_SHORT).show();
 
 
     }
@@ -137,4 +140,5 @@ public class MessageContact extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
 }
