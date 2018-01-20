@@ -17,6 +17,7 @@
         android:required="true" />
 
     <application
+        android:name=".Safely"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -29,6 +30,7 @@
             android:name=".NirbhayaActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".home" />
+
         <activity android:name=".Sign_in">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,9 +45,8 @@
         <activity
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
-        </activity>
 
         <service
             android:name=".PhoneLocatorService"

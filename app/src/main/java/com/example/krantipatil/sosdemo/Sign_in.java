@@ -18,6 +18,7 @@ import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.READ_CONTACTS;
 import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.SEND_SMS;
+
 public class Sign_in extends AppCompatActivity {
     public static final int RequestPermissionCode = 1;
     public EditText phonenumber, password;
@@ -27,9 +28,10 @@ public class Sign_in extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-        init();
+
         phonenumber = findViewById(R.id.get_pn_sign_in);
         password = findViewById(R.id.get_password_sign_in);
+        //sharedPreferences = Safely.getSharedPrefs();
 
         if (checkPermission()) {
 
@@ -40,7 +42,7 @@ public class Sign_in extends AppCompatActivity {
             requestPermission();
         }
 
-
+        init();
 
     }
 
@@ -49,14 +51,30 @@ public class Sign_in extends AppCompatActivity {
         logIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                switch (view.getId()) {
+                    case R.id.log_in:
+                        if (phonenumber.getText().toString().equalsIgnoreCase("1234") &&
+                                password.getText().toString().equalsIgnoreCase("123")) {
 
-                Intent loginIntent = new Intent(Sign_in.this, Main2Activity.class);
-                startActivity(loginIntent);
+                            //saveSharedPrefs();
+                            Intent loginIntent = new Intent(Sign_in.this, Main2Activity.class);
+                            startActivity(loginIntent);
+
+                        }
+                        break;
+
+                }
+
             }
         });
 
 
     }
+    /*private void saveSharedPrefs() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isLoggedIn",true);
+        editor.commit();
+    }*/
 
     private void requestPermission() {
 
