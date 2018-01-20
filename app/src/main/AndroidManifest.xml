@@ -29,7 +29,13 @@
             android:name=".NirbhayaActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".home" />
-        <activity android:name=".Sign_in" />
+        <activity android:name=".Sign_in">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".Sign_up" />
         <activity android:name=".profile" />
         <activity android:name=".Emeregency_contacts" />
@@ -38,11 +44,7 @@
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <service
