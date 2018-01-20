@@ -73,6 +73,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return contactModels;
     }
 
+    public Cursor getAllData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("Select * from " + TABLE_NAME, null);
+        return result;
+    }
     public int getContactCount() {
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         String SELECT_QUERY = "SELECT * FROM " + TABLE_NAME;
